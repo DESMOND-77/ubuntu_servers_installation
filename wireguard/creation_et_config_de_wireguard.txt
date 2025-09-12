@@ -1,0 +1,41 @@
+
+📌 On the Client
+
+	wg genkey | tee privatekey | wg pubkey | tee publickey
+
+	PrivateKey =
+	PublicKey = 
+
+[Interface]
+### PrivateKey_of_the_Client
+PrivateKey = 
+### IP VPN for the Client
+Address = 
+### DNS Server
+DNS = 8.8.8.8, 8.8.4.4
+
+[Peer]
+###Public of the WireGuard VPN Server
+PublicKey = 
+
+### IP and Port of the WireGuard VPN Server
+##### Syntax: IP_of_the_server:Port
+Endpoint = 
+
+### Allow all traffic
+AllowedIPs = 0.0.0.0/0
+
+📌 On WireGuard VPN Server
+
+	wg set wg0 peer PublicKey_of_the_Client allowed-ips IP_VPN_of_the_Client
+
+####verifie confi file
+wg show wg0
+
+#####save configuration
+
+wg-quick save wg0 
+
+##active vpn connection on client
+
+wg-quick up wg0
