@@ -1,0 +1,123 @@
+
+***********************************sip************************************************
+on active le videosupport=yes
+on met language=fr
+
+[genral]
+language=fr
+allowguest=no
+allowoverlap=no
+bindport=5060
+bindaddr=0.0.0.0
+svrlookup=no
+alwaysauthreject=yes
+canreinvite=no
+nat=yes
+session-timers=refuse
+localnet=192.168.0.0/255.255.255.0
+disallow=all
+allow=ilbc,g729,gsm,g723,ulaw,alaw,h263,h263p,h264,vp8,g723.1   
+dtmfmode=rfc2833
+directmedia=yes
+videosupport=yes
+host=dynamic
+
+
+[1000]
+username=user1
+fullname=admin user1
+mailbox=1000@voiceMail
+secret=user1
+context=internal
+
+
+
+*********************************extensions******************************************
+[internal]
+exten => 500,1,VoiceMailMain()
+exten => 500,1,HangUp()
+exten => 500,1,PlayBack(vm-goodbye)
+exten => 500,1,HangUp()
+
+exten => 100,1,Dial(SIP/100,5)
+exten => 100,2,VoiceMail(100)
+
+
+exten => 200,1,Dial(SIP/200,5)
+exten => 200,2,VoiceMail(200)
+
+
+
+include => packedcalls
+
+============================================
+exten => 100X,5,Dial(SIP/${EXTEN},60,tTrm(sidy))
+exten => 100X,7,VoiceMail(${EXTEN}@VoiceMail)
+
+exten => 1000,1,Ringing
+exten => 1000,2,Wait(1)
+exten => 1000,3,Answer()
+exten => 1000,4,Set(CHANNEL(musicclass)=sidy)
+exten => 1000,5,Dial(SIP/1000,60,tTrm(sidy))
+exten => 1000,6,PlayBack(vm-nobodyavail // %path%)
+exten => 1000,7,VoiceMail(1000@VoiceMail)
+exten => 1000,8,Hangup()
+
+
+=======================================
+exten => 101,1,VoicemailMain(1000@main)		mail service
+exten => 101,1,VoicemailMain(${CALLERID(num)}@VoiceMail)
+==============================================
+exten => 2001,1,VoicemailMain(1000@main)
+exten => 2001,2,Hangup()
+exten => 2002,1,VoicemailMain(1100@VoiceMail)
+exten => 2002,2,Hangup()
+
+
+*********************************voicemail************************************************
+on crée le contexte Voicemail qu'est similaire à celui renseigné dans
+extensions.conf lors de la partie voicemail
+[VoiceMail]
+
+num       ||mtpasse||fullname
+1000 => user1,admin user1
+1100 => user2,admin user2
+
+
+[general]
+format=wav49|wav|g723sf
+maxmsg=100
+maxsec=60
+minsec=3
+skipms=3000
+maxsilence=10
+silencethreshold=128
+maxlogins=3
+
+[default]
+100=>666,son goku,son.goku@gmail.com
+
+
+***************************music on hold***************************************
+mkdir /var/lib/asterik/monmp3 : cp /home//user/téléchargements /m\m\m\m\m\m\(répétition/_.mp3  /var/lib/asterik/monmp3
+gedit musiconhold.conf
+apt-get install mpg123
+	on renseigne le chemin oú la music est mise
+[sidy]
+mode=custom
+directory=/var/lib/asterik/monmp3
+application=/usr/bin/mpg123 -q -r 8000 -f 8192 -b 2048 --mono -s
+
+
+*****************************DIVERS****************************************************
+toujour fixe l'address du serveur
+systemctl start asterisk
+asterisk -r
+         reload
+         module reload chan_sip.so
+        sip show peers
+        sip show users
+svmap ip address
+svcrack -u $username$ target(ip)
+inviteflood eth0 1000 192.168.1.50(attacker) 192.168.1.10(server)  7895461(parkets)
+zenmap

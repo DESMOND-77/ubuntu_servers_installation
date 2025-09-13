@@ -1,0 +1,40 @@
+
+
+
+
+
+
+
+
+&&&&&&&&&&extension&&&&&&&&&&&&&&
+voicemail menu
+
+exten => 500,1,VoiceMailMain()
+exten => 500,1,HangUp()
+exten => 500,1,PlayBack(vm-goodbye)
+exten => 500,1,HangUp()
+
+user 100
+
+exten => 100,1,Dial(SIP/100,5)
+exten => 100,2,VoiceMail(100)
+
+user 200
+
+exten => 200,1,Dial(SIP/200,5)
+exten => 200,2,VoiceMail(200)
+
+&&&&&&&&&&&&&&voicemail&&&&&&&&&&&&&
+
+[general]
+format=wav49|wav
+maxmsg=100
+maxsec=60
+minsec=3
+skipms=3000
+maxsilence=10
+silencethreshold=128
+maxlogins=3
+
+[default]
+100=>666,son goku,son.goku@gmail.com
