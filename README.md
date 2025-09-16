@@ -13,6 +13,21 @@ This collection of scripts aims to simplify and automate the process of installi
 - Files:
   - `install_wireguard.sh`: Automated installation script for WireGuard VPN server
   - `creation_et_config_de_wireguard.txt`: Configuration guide and documentation
+  - `README.md`: Detailed installation and configuration instructions
+
+### Zabbix Monitoring Server
+- Location: `/zabbix/`
+- Files:
+  - `install_zabbix.sh`: Automated installation script for Zabbix server
+  - `libmysqlclient21_8.0.28-0ubuntu4_amd64.deb`: Required MySQL client library
+  - `README.md`: Installation guide and dependency information
+
+### Asterisk VoIP Server
+- Location: `/asterisk/`
+- Files:
+  - `asterisk_base_config.txt`: Base configuration examples
+  - `asterisk voip.txt`: VoIP configuration guide
+  - `README.md`: Comprehensive installation and setup guide
 
 ## Usage
 
