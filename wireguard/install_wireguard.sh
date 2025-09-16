@@ -17,17 +17,18 @@ if ! grep -qs -E "(debian|ubuntu)" /etc/os-release; then
 fi
 
 SERVER_IP=$(curl -4 -s ifconfig.me)   # IP publique IPv4 du serveur
-SERVER_PORT=51820
+SERVER_PORT=36090
 SERVER_INTERFACE="wg0"
-SERVER_NETWORK="10.0.0.0/24"
+SERVER_NETWORK="10.30.20"
 SERVER_CONF="/etc/wireguard/$SERVER_INTERFACE.conf"
 SERVER_PRIV_KEY="/etc/wireguard/private.key"
 SERVER_PUB_KEY="/etc/wireguard/public.key"
-clients_folder="~/Bureau/wireguard_clients"
+clients_folder="~/wireguard_clients"
 echo "=== Mise à jour du système et installation des paquets ==="
 apt update && apt install -y wireguard-tools qrencode curl
 
 echo "=== Génération des clés du serveur ==="
+mkdir -p $clients_folder
 umask 077
 mkdir -p /etc/wireguard
 wg genkey | tee "$SERVER_PRIV_KEY" | wg pubkey > "$SERVER_PUB_KEY"
@@ -40,7 +41,7 @@ DEFAULT_IFACE=$(ip route get 8.8.8.8 | awk '{print $5; exit}')
 
 cat > "$SERVER_CONF" <<EOF
 [Interface]
-Address = 10.0.0.1/24
+Address = $SERVER_NETWORK.1/24
 ListenPort = $SERVER_PORT
 PrivateKey = $SERVER_PRIV
 SaveConfig = False
@@ -64,7 +65,7 @@ for i in $(seq 1 "$NUM_CLIENTS"); do
     CLIENT_NAME="client$i"
     CLIENT_PRIV_KEY=$(wg genkey)
     CLIENT_PUB_KEY=$(echo "$CLIENT_PRIV_KEY" | wg pubkey)
-    CLIENT_IP="10.0.0.$((i+1))/24"
+    CLIENT_IP="$SERVER_NETWORK.$((i+1))/32"
 
     echo "=== Ajout du $CLIENT_NAME ($CLIENT_IP) ==="
 
@@ -77,13 +78,12 @@ AllowedIPs = $CLIENT_IP
 EOF
 
     # Création fichier client
-    mkdir -p $clients_folder
     CLIENT_CONF="$clients_folder/$CLIENT_NAME.conf"
     touch $CLIENT_CONF
     cat > "$CLIENT_CONF" <<EOF
 [Interface]
 PrivateKey = $CLIENT_PRIV_KEY
-Address = 10.0.0.$((i+1))/24
+Address = $SERVER_NETWORK.$((i+1))/24
 DNS = 1.1.1.1, 8.8.8.8
 
 [Peer]
@@ -100,8 +100,12 @@ EOF
 done
 
 echo "=== Rechargement de la configuration WireGuard ==="
+chmod 600 $SERVER_CONF
+chmod 600 $SERVER_PRIV_KEY
+
+ufw allow $SERVER_PORT/udp
 wg syncconf "$SERVER_INTERFACE" <(wg-quick strip "$SERVER_INTERFACE")
 
 echo "=== Installation terminée ==="
-echo "Les fichiers clients sont dans ~/wireguard_clients/"
+echo "Les fichiers clients sont dans $clients_folder"
 echo "Utilisez 'qrencode -t ansiutf8 < fichier.conf' pour réafficher les QR codes"
