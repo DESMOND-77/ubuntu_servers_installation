@@ -1,70 +1,97 @@
-# Ubuntu Servers Installation Scripts
+# Ubuntu Servers & Development Environment Installation Scripts
 
-This repository contains automated installation scripts for various server applications on Linux distributions, primarily focused on Ubuntu.
+Ce dépôt contient des scripts d'automatisation pour l'installation et la configuration de différents serveurs et environnements de développement sous Linux, principalement orientés Ubuntu.
 
-## Overview
+## Vue d'ensemble
 
-This collection of scripts aims to simplify and automate the process of installing and configuring different types of servers on Linux systems. Each script is designed to provide a straightforward and reproducible installation process.
+Cette collection de scripts vise à simplifier et automatiser le processus d'installation et de configuration de différents types de serveurs et d'environnements de développement sur les systèmes Linux. Chaque script est conçu pour fournir un processus d'installation simple et reproductible.
 
-## Available Scripts
+## Scripts Disponibles
 
-### WireGuard VPN Server
+### Environnement de Développement
+#### DevOps, Réseaux, IA & Web 
+- Location: `/Os_installation/`
+- Files:
+  - `setup_DevOps-network-ia-web.sh`: Script complet d'installation incluant :
+    - Outils réseau et cybersécurité (Nmap, Wireshark, TCPdump)
+    - Docker & Docker Compose
+    - Node.js & npm
+    - n8n (Automatisation)
+    - Ollama (IA locale)
+    - Stack LAMP (Apache, MySQL, PHP)
+    - VSCode, Postman, Terminator
+    - GitHub CLI
+    - Ansible
+  - `README.md`: Guide d'installation détaillé et documentation
+
+### Serveur VPN WireGuard
 - Location: `/wireguard/`
 - Files:
-  - `install_wireguard.sh`: Automated installation script for WireGuard VPN server
-  - `creation_et_config_de_wireguard.txt`: Configuration guide and documentation
-  - `README.md`: Detailed installation and configuration instructions
+  - `install_wireguard.sh`: Script d'installation automatisée du serveur VPN
+  - `creation_et_config_de_wireguard.txt`: Guide de configuration
+  - `README.md`: Instructions détaillées d'installation et de configuration
 
-### Zabbix Monitoring Server
-- Location: `/zabbix/`
-- Files:
-  - `install_zabbix.sh`: Automated installation script for Zabbix server
-  - `libmysqlclient21_8.0.28-0ubuntu4_amd64.deb`: Required MySQL client library
-  - `README.md`: Installation guide and dependency information
+## Utilisation
 
-### Asterisk VoIP Server
-- Location: `/asterisk/`
-- Files:
-  - `asterisk_base_config.txt`: Base configuration examples
-  - `asterisk voip.txt`: VoIP configuration guide
-  - `README.md`: Comprehensive installation and setup guide
-
-## Usage
-
-1. Clone this repository:
+1. Clonez ce dépôt :
 ```bash
 git clone https://github.com/DESMOND-77/ubuntu_servers_installation.git
 ```
 
-2. Navigate to the specific server directory you want to install
-3. Make the installation script executable:
+2. Accédez au répertoire du script que vous souhaitez utiliser :
 ```bash
-chmod +x install_*.sh
+cd ubuntu_servers_installation/<dossier_script>
 ```
 
-4. Run the installation script:
+3. Rendez le script exécutable :
 ```bash
-./install_*.sh
+chmod +x *.sh
 ```
 
-## Requirements
+4. Exécutez le script avec sudo :
+```bash
+sudo ./script_name.sh
+```
 
-- Ubuntu or compatible Linux distribution
-- Root/sudo privileges
-- Basic understanding of server administration
+## Prérequis
 
-## Contributing
+- Ubuntu ou distribution Linux compatible
+- Privilèges root/sudo
+- Connexion Internet stable
+- Connaissance de base en administration système
 
-Feel free to contribute by:
-1. Forking the repository
-2. Creating your feature branch
-3. Committing your changes
-4. Creating a pull request
+## Structure du Projet
 
-## License
+```
+ubuntu_servers_installation/
+├── Os_installation/
+│   ├── setup_DevOps-network-ia-web.sh
+│   └── README.md
+├── wireguard/
+│   ├── install_wireguard.sh
+│   ├── creation_et_config_de_wireguard.txt
+│   └── README.md
+└── README.md
+```
 
-This project is open source and available under the MIT License.
+## Contribution
 
-## Disclaimer
+N'hésitez pas à contribuer en :
+1. Forkant le dépôt
+2. Créant votre branche de fonctionnalité
+3. Committant vos modifications
+4. Créant une pull request
 
-Please review all scripts before running them on your system. While these scripts are designed to be safe and efficient, it's always good practice to understand what you're installing on your server.
+## Sécurité
+
+- Tous les scripts sont exécutés avec des privilèges sudo
+- Vérifiez toujours le contenu des scripts avant de les exécuter
+- Les scripts incluent des vérifications de base pour éviter les erreurs courantes
+
+## Licence
+
+Ce projet est open source et disponible sous la licence MIT.
+
+## Avertissement
+
+Veuillez examiner tous les scripts avant de les exécuter sur votre système. Bien que ces scripts soient conçus pour être sûrs et efficaces, il est toujours recommandé de comprendre ce que vous installez sur votre système.
