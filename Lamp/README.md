@@ -52,7 +52,7 @@ Script d'automatisation pour l'installation et la configuration d'un environneme
 ### Téléchargez le script
 
 ```bash
-wget https://github.com/DESMOND-77/ubuntu_servers_installation/tree/6075b30991eb9f5adeb5f4fa09537d442c449757/Lamp/install_lamp.sh
+wget https://github.com/DESMOND-77/ubuntu_servers_installation/Lamp/install_lamp.sh
 ```
 
 ### Rendez le script exécutable
