@@ -8,8 +8,8 @@ Cette collection de scripts vise à simplifier et automatiser le processus d'ins
 
 ## Scripts disponibles
 
-### 🖥 Configuration Système
-- Location: `/Os_installation/`
+### Configuration Système
+- Location: `/devOps-network-ia-web/`
 - Files:
   - `setup_DevOps-network-ia-web.sh`: Script complet d'installation pour un environnement DevOps, Réseau, IA et Web
   - `README.md`: Guide détaillé d'installation et de configuration
@@ -22,32 +22,36 @@ Cette collection de scripts vise à simplifier et automatiser le processus d'ins
   - Ansible et n8n
   - Ollama (IA locale)
 
-### 🔒 Serveur VPN WireGuard
+### Serveur VPN WireGuard
 - Location: `/wireguard/`
 - Files:
   - `install_wireguard.sh`: Script d'installation automatisée du serveur VPN
   - `creation_et_config_de_wireguard.txt`: Guide de configuration détaillé
   - `README.md`: Instructions complètes d'installation
 
-### 📊 Serveur de Monitoring Zabbix
+### Serveur de Monitoring Zabbix
 - Location: `/zabbix/`
 - Files:
   - `install_zabbix.sh`: Script d'installation automatisée de Zabbix
   - `libmysqlclient21_8.0.28-0ubuntu4_amd64.deb`: Bibliothèque client MySQL requise
   - `README.md`: Guide d'installation et informations sur les dépendances
 
-### ☎️ Serveur VoIP Asterisk
+### Serveur VoIP Asterisk
 - Location: `/asterisk/`
 - Files:
   - `asterisk_base_config.txt`: Exemples de configuration de base
   - `asterisk voip.txt`: Guide de configuration VoIP
   - `README.md`: Guide complet d'installation et de configuration
-
+### Serveur LAMP
+- Location: `/lamp/`
+- Files:
+  - `install_lamp.sh`: Script d'installation automatisée de lamp
+  - `README.md`: Guide d'installation, de configuration et informations sur les dépendances
 ## Structure du projet
 
 ```
 ubuntu_servers_installation/
-├── Os_installation/
+├── devOps-network-ia-web/
 │   ├── setup_DevOps-network-ia-web.sh
 │   └── README.md
 ├── wireguard/
@@ -61,6 +65,9 @@ ubuntu_servers_installation/
 ├── asterisk/
 │   ├── asterisk_base_config.txt
 │   ├── asterisk voip.txt
+│   └── README.md
+├── lamp/
+│   ├── install_lamp.sh
 │   └── README.md
 └── README.md
 ```

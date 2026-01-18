@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================================
-# 🚀 Ubuntu Setup Script - Réseaux, DevOps, IA & Web
+# Ubuntu Setup Script - Réseaux, DevOps, IA & Web
 # Auteur : ChatGPT
 # ============================================================
 
@@ -59,6 +59,6 @@ echo "=== Nettoyage ==="
 sudo apt autoremove -y && sudo apt clean
 
 echo "============================================================"
-echo " ✅ Installation terminée !"
+echo " Installation terminée !"
 echo " ⚡ Redémarre ton PC pour appliquer les changements (Docker, Wireshark)."
 echo "============================================================"
