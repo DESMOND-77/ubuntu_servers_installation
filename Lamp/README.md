@@ -17,27 +17,27 @@ Script d'automatisation pour l'installation et la configuration d'un environneme
 
 ## Fonctionnalités
 
-✅ Installation automatique d'Apache 2
+- Installation automatique d'Apache 2
 
-✅ Installation automatique de MySQL/MariaDB
+- Installation automatique de MySQL/MariaDB
 
-✅ Installation automatique de PHP 7.4+
+- Installation automatique de PHP 7.4+
 
-✅ Installation automatique de phpMyAdmin
+- Installation automatique de phpMyAdmin
 
-✅ Configuration sécurisée de MySQL
+- Configuration sécurisée de MySQL
 
-✅ Configuration automatique des virtual hosts
+- Configuration automatique des virtual hosts
 
-✅ Activation des modules Apache nécessaires
+- Activation des modules Apache nécessaires
 
-✅ Création de pages de test
+- Création de pages de test
 
-✅ Journalisation complète de l'installation
+- Journalisation complète de l'installation
 
-✅ Vérification des services après installation
+- Vérification des services après installation
 
-✅ Messages colorés pour une meilleure lisibilité
+- Messages colorés pour une meilleure lisibilité
 
 ## Prérequis
 
@@ -52,7 +52,7 @@ Script d'automatisation pour l'installation et la configuration d'un environneme
 ### Téléchargez le script
 
 ```bash
-wget https://github.com/DESMOND-77/ubuntu_servers_installation/blob/zabbix/install_lamp.sh
+wget https://github.com/DESMOND-77/ubuntu_servers_installation/lamp/install_lamp.sh
 ```
 
 ### Rendez le script exécutable
@@ -124,17 +124,17 @@ sudo ./install_lamp.sh
 
 ### Actions automatiques du script
 
-✅ Désactivation du site Apache par défaut
+- Désactivation du site Apache par défaut
 
-✅ Suppression des bases de test MySQL
+- Suppression des bases de test MySQL
 
-✅ Suppression des utilisateurs anonymes MySQL
+- Suppression des utilisateurs anonymes MySQL
 
-✅ Configuration du mot de passe root MySQL
+- Configuration du mot de passe root MySQL
 
-✅ Activation des modules de sécurité Apache
+- Activation des modules de sécurité Apache
 
-✅ Configuration des permissions restrictives
+- Configuration des permissions restrictives
 
 ### Actions recommandées après installation
 
@@ -276,6 +276,7 @@ Si vous rencontrez des problèmes :
 
 - Ubuntu 20.04 LTS
 - Ubuntu 22.04 LTS
+- Pop!_OS 22.04 LTS
 - Debian 11
 - Debian 12
 
