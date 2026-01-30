@@ -2,7 +2,7 @@
 
 # ============================================================
 # Ubuntu Setup Script - Réseaux, DevOps, IA & Web
-# Auteur : ChatGPT
+# Auteur : DESMOND-77
 # ============================================================
 
 echo "=== Mise à jour du système ==="
