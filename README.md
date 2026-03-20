@@ -9,6 +9,7 @@ Cette collection de scripts vise à simplifier et automatiser le processus d'ins
 ## Scripts disponibles
 
 ### Configuration Système
+
 - Location: `/devOps-network-ia-web/`
 - Files:
   - `setup_DevOps-network-ia-web.sh`: Script complet d'installation pour un environnement DevOps, Réseau, IA et Web
@@ -23,6 +24,7 @@ Cette collection de scripts vise à simplifier et automatiser le processus d'ins
   - Ollama (IA locale)
 
 ### Serveur VPN WireGuard
+
 - Location: `/wireguard/`
 - Files:
   - `install_wireguard.sh`: Script d'installation automatisée du serveur VPN
@@ -30,6 +32,7 @@ Cette collection de scripts vise à simplifier et automatiser le processus d'ins
   - `README.md`: Instructions complètes d'installation
 
 ### Serveur de Monitoring Zabbix
+
 - Location: `/zabbix/`
 - Files:
   - `install_zabbix.sh`: Script d'installation automatisée de Zabbix
@@ -37,19 +40,26 @@ Cette collection de scripts vise à simplifier et automatiser le processus d'ins
   - `README.md`: Guide d'installation et informations sur les dépendances
 
 ### Serveur VoIP Asterisk
+
 - Location: `/asterisk/`
 - Files:
   - `asterisk_base_config.txt`: Exemples de configuration de base
   - `asterisk voip.txt`: Guide de configuration VoIP
   - `README.md`: Guide complet d'installation et de configuration
+
 ### Serveur LAMP
-- Location: `/lamp/`
+
+- Location: `/Lamp/`
 - Files:
-  - `install_lamp.sh`: Script d'installation automatisée de lamp
-  - `README.md`: Guide d'installation, de configuration et informations sur les dépendances
+  - `install_lamp.sh`: Script d'installation automatisée LAMP + phpMyAdmin
+  - `index.php`: 🧠 VirtualHost Manager v3.0.0 (GUI web pour gérer vhosts/hosts)
+  - `README.md`: Guide complet avec VirtualHost Manager
+
+**Usage** : `sudo ./Lamp/install_lamp.sh`
+
 ## Structure du projet
 
-```
+```text
 ubuntu_servers_installation/
 ├── devOps-network-ia-web/
 │   ├── setup_DevOps-network-ia-web.sh
@@ -75,11 +85,13 @@ ubuntu_servers_installation/
 ## Utilisation
 
 1. Clonez ce dépôt :
+
 ```bash
 git clone https://github.com/DESMOND-77/ubuntu_servers_installation.git
 ```
 
 2. Accédez au répertoire du script souhaité :
+
 ```bash
 cd ubuntu_servers_installation/<dossier_script>
 ```
@@ -87,11 +99,13 @@ cd ubuntu_servers_installation/<dossier_script>
 3. Consultez le README.md du dossier pour les instructions spécifiques
 
 4. Rendez le script d'installation exécutable :
+
 ```bash
 chmod +x *.sh
 ```
 
 5. Exécutez le script avec les privilèges sudo :
+
 ```bash
 sudo ./script_name.sh
 ```
@@ -114,12 +128,14 @@ sudo ./script_name.sh
 ## Contribution
 
 N'hésitez pas à contribuer en :
+
 1. Forkant le dépôt
 2. Créant votre branche de fonctionnalité
 3. Committant vos modifications
 4. Créant une pull request
 
 Les contributions sont les bienvenues pour :
+
 - Ajouter de nouveaux scripts d'installation
 - Améliorer les scripts existants
 - Mettre à jour la documentation

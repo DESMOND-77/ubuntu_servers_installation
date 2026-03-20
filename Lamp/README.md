@@ -101,24 +101,54 @@ sudo ./install_lamp.sh
 
 ```text
 /var/www/html/              # Racine du site web
-├── index.html              # Page d'accueil de test
-├── info.php               # Page d'information PHP
+├── index.php              # 🧠 VirtualHost Manager (GUI)
+├── info.php               # Page d'information PHP (supprimer après test)
 └── (vos fichiers)
 
 /etc/apache2/sites-available/
-└── mon_site.conf          # Configuration du virtual host
+└── 000-default.conf       # VirtualHost par défaut (avec phpMyAdmin)
 
-/usr/share/phpmyadmin      # Installation de phpMyAdmin
+sudoers.d/apache-vhost     # Permissions www-data pour gestion vhosts
+
+/usr/share/phpmyadmin      # phpMyAdmin installé
 ```
 
 ## Services installés
 
 | Service | Version | Port | Accès |
 |---------|---------|------|-------|
-| Apache 2 | 2.4+ | 80 (HTTP) | http://votre-ip |
+| Apache 2 | 2.4+ | 80 (HTTP) | <http://votre-ip> |
 | MySQL | 8.0+ | 3306 | mysql -u root -p |
-| PHP | 7.4+ | N/A | http://votre-ip/info.php |
-| phpMyAdmin | Dernière | N/A | http://votre-ip/phpmyadmin |
+| PHP | 7.4+ | N/A | <http://votre-ip/info.php> |
+| phpMyAdmin | Dernière | N/A | <http://votre-ip/phpmyadmin> |
+
+## 🧠 VirtualHost Manager (Nouveau!)
+
+Après installation, accédez à l'interface web moderne de gestion des VirtualHosts Apache directement depuis votre navigateur !
+
+### Fonctionnalités
+
+- **Gestion complète des vhosts** : Créer, éditer, activer/désactiver, supprimer
+- **Gestion /etc/hosts** : Ajouter/modifier/supprimer entrées DNS locales
+- **Thèmes personnalisés** : Carbon, Frost, Amber, Dracula, Nord
+- **Contrôle Apache** : Reload, Restart avec statut en temps réel
+- **Statistiques** : VHosts actifs/inactifs, SSL, etc.
+- **Responsive** : Interface moderne, mobile-friendly
+- **Version** : 3.0.0
+
+### Accès
+
+```
+http://votre-ip/index.php
+```
+
+### Prérequis (configurés automatiquement par install_lamp.sh)
+
+```
+sudoers.d/apache-vhost : www-data peut gérer a2ensite/a2dissite
+Permissions : /etc/apache2/sites-available/ en 775 (www-data)
+Fichier copié : Lamp/index.php → /var/www/html/index.php
+```
 
 ## Sécurité
 
@@ -270,7 +300,7 @@ Si vous rencontrez des problèmes :
 - Consultez la section Dépannage
 - Vérifiez les logs d'installation
 - Ouvrez une issue sur GitHub
-- Contactez l'auteur (si fourni)
+- Contactez l'auteur
 
 **Note** : Ce script a été testé sur :
 
@@ -280,7 +310,7 @@ Si vous rencontrez des problèmes :
 - Debian 11
 - Debian 12
 
-**Dernière mise à jour** : 18/01/2026
+**Dernière mise à jour** : 20/03/2026 (VirtualHost Manager v3.0.0 ajouté)
 
 ---
 
