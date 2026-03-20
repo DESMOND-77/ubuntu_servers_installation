@@ -59,27 +59,29 @@ Cette collection de scripts vise à simplifier et automatiser le processus d'ins
 
 ## Structure du projet
 
-```text
-ubuntu_servers_installation/
-├── devOps-network-ia-web/
-│   ├── setup_DevOps-network-ia-web.sh
-│   └── README.md
-├── wireguard/
-│   ├── install_wireguard.sh
-│   ├── creation_et_config_de_wireguard.txt
-│   └── README.md
-├── zabbix/
-│   ├── install_zabbix.sh
-│   ├── libmysqlclient21_8.0.28-0ubuntu4_amd64.deb
-│   └── README.md
-├── asterisk/
-│   ├── asterisk_base_config.txt
-│   ├── asterisk voip.txt
-│   └── README.md
-├── lamp/
-│   ├── install_lamp.sh
-│   └── README.md
-└── README.md
+**racine:** `ubuntu_servers_installation`
+
+```markdown
+├── 📁 Lamp
+│   ├── 📝 README.md
+│   ├── 🐘 index.php
+│   └── 📄 install_lamp.sh
+├── 📁 asterisk
+│   ├── 📝 README.md
+│   ├── 📄 asterisk voip.txt
+│   └── 📄 asterisk_base_config.txt
+├── 📁 devOps-network-ia-web
+│   ├── 📝 README.md
+│   └── 📄 setup_DevOps-network-ia-web.sh
+├── 📁 wireguard
+│   ├── 📝 README.md
+│   ├── 📄 creation_et_config_de_wireguard.txt
+│   └── 📄 install_wireguard.sh
+├── 📁 zabbix
+│   ├── 📝 README.md
+│   ├── 📄 install_zabbix.sh
+│   └── 📄 libmysqlclient21_8.0.28-0ubuntu4_amd64.deb
+└── 📝 README.md
 ```
 
 ## Utilisation

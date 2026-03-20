@@ -37,8 +37,8 @@ sudo npm install -g n8n
 echo "=== Installation Ollama (IA locale) ==="
 curl -fsSL https://ollama.com/install.sh | sh
 
-echo "=== Installation LAMP Stack (Apache, MySQL, PHP) ==="
-sudo apt install -y apache2 mysql-server php libapache2-mod-php php-mysql
+# echo "=== Installation LAMP Stack (Apache, MySQL, PHP) ==="
+# sudo apt install -y apache2 mysql-server php libapache2-mod-php php-mysql
 
 echo "=== Installation VSCode ==="
 sudo snap install code --classic

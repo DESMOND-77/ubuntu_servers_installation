@@ -30,10 +30,10 @@ Le script `setup_DevOps-network-ia-web.sh` installe et configure les composants 
 ### 💻 Développement
 - Node.js & npm (version 20.x)
 - n8n (Automatisation des workflows)
-- Stack LAMP
+<!-- - Stack LAMP
   - Apache2
   - MySQL Server
-  - PHP
+  - PHP -->
 
 ### 🤖 Intelligence Artificielle
 - Ollama (IA locale)
@@ -71,8 +71,8 @@ Après l'installation :
 
 1. Redémarrez votre système
 2. Vérifiez que Docker fonctionne : `docker run hello-world`
-3. Testez la connexion MySQL : `mysql -u root -p`
-4. Vérifiez le service Apache : `http://localhost`
+<!-- 3. Testez la connexion MySQL : `mysql -u root -p` -->
+3. Vérifiez le service Apache : `http://localhost`
 
 ## 📝 Personnalisation
 
