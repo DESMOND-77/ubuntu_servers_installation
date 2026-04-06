@@ -192,7 +192,7 @@ phpinfo();
 ?>
 EOF
 
-cat ./index.php > /var/www/html/index.php 
+cp ./index.php /var/www/html/index.php 
 
 # Ajustement des permissions
 print_message "Ajustement des permissions..."
