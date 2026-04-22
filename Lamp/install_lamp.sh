@@ -193,7 +193,7 @@ phpinfo();
 EOF
 
 cp ./index.php /var/www/html/index.php 
-
+rm /var/www/html/*.html
 # Ajustement des permissions
 print_message "Ajustement des permissions..."
 chown www-data:www-data /var/www/html/index.php
