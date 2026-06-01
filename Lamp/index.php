@@ -80,12 +80,28 @@ function getApacheStatus(): array
     preg_match('/Apache\/(\S+)/i', $version, $m);
     return ['running' => $status === 'active', 'status' => $status ?: 'unknown', 'version' => $m[1] ?? 'unknown'];
 }
-function runCommand(string $cmd): array
+/**
+ * Envoie une commande au daemon vhost-helper via socket Unix.
+ * Plus de sudo depuis PHP — le daemon root exécute les opérations privilégiées.
+ */
+function runVhostCmd(string $action, array $args = [], string $content = ''): array
 {
-    $out = [];
-    $code = 0;
-    exec($cmd . ' 2>&1', $out, $code);
-    return ['output' => implode("\n", $out), 'code' => $code];
+    $sockPath = '/run/vhost-manager.sock';
+    if (!file_exists($sockPath)) {
+        return ['code' => 1, 'output' => '⚠ Daemon vhost-helper absent. Lancez : sudo systemctl start vhost-helper'];
+    }
+    $req  = json_encode(['cmd' => $action, 'args' => $args, 'content' => $content]);
+    $sock = @stream_socket_client('unix://' . $sockPath, $errno, $errstr, 5);
+    if (!$sock) {
+        return ['code' => 1, 'output' => "Socket inaccessible : $errstr ($errno)"];
+    }
+    fwrite($sock, $req);
+    stream_socket_shutdown($sock, STREAM_SHUT_WR);
+    $resp = '';
+    while (!feof($sock)) $resp .= fread($sock, 65536);
+    fclose($sock);
+    $data = json_decode($resp, true);
+    return $data ?: ['code' => 1, 'output' => 'Réponse daemon invalide'];
 }
 
 // ─── HOSTS HELPERS ─────────────────────────────────────────────────────────
@@ -136,11 +152,7 @@ function writeHostsFile(array $entries): bool
         return $e['raw'];
     }, $entries);
     $content = implode("\n", $lines) . "\n";
-    // Écriture via sudo tee
-    $tmp = tempnam(sys_get_temp_dir(), 'hosts_');
-    file_put_contents($tmp, $content);
-    $res = runCommand("sudo tee " . HOSTS_FILE . " < " . escapeshellarg($tmp) . " > /dev/null");
-    unlink($tmp);
+    $res = runVhostCmd('write_hosts', [], $content);
     return $res['code'] === 0;
 }
 
@@ -224,10 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'enable':
         case 'disable':
-            $cmd = $action === 'enable' ? "sudo a2ensite" : "sudo a2dissite";
-            $res = runCommand("$cmd " . escapeshellarg($site));
+            $res = runVhostCmd($action === 'enable' ? 'a2ensite' : 'a2dissite', [$site]);
             if ($res['code'] === 0) {
-                runCommand("sudo apachectl graceful");
+                runVhostCmd('apache_reload');
                 $message = "✓ Site <strong>$site</strong> " . ($action === 'enable' ? 'activé' : 'désactivé') . ".";
                 $msgType = 'success';
             } else {
@@ -237,13 +248,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'restart':
-            $res = runCommand("sudo apachectl restart");
+            $res = runVhostCmd('apache_restart');
             $message = $res['code'] === 0 ? "✓ Apache2 redémarré." : "✗ " . htmlspecialchars($res['output']);
             $msgType = $res['code'] === 0 ? 'success' : 'error';
             break;
 
         case 'reload':
-            $res = runCommand("sudo apachectl graceful");
+            $res = runVhostCmd('apache_reload');
             $message = $res['code'] === 0 ? "✓ Apache2 rechargé (graceful)." : "✗ " . htmlspecialchars($res['output']);
             $msgType = $res['code'] === 0 ? 'success' : 'error';
             break;
@@ -281,7 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
             if (@file_put_contents($fpath, $content) !== false) {
-                runCommand("sudo apachectl graceful");
+                runVhostCmd('apache_reload');
                 $message = "✓ <strong>$site</strong> sauvegardé et Apache rechargé.";
                 $msgType = 'success';
             } else {
@@ -298,14 +309,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
             if (isEnabled($site)) {
-                runCommand("sudo a2dissite " . escapeshellarg($site));
-                runCommand("sudo apachectl graceful");
+                runVhostCmd('a2dissite', [$site]);
+                runVhostCmd('apache_reload');
             }
             if (@unlink($fpath)) {
                 $message = "✓ VHost <strong>$site</strong> supprimé.";
                 $msgType = 'success';
             } else {
-                $message = "✗ Impossible de supprimer — vérifiez les permissions.";
+                $message = "✗ Impossible de supprimer — vérifiez les permissions sur sites-available.";
                 $msgType = 'error';
             }
             break;
@@ -348,7 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = "✓ Entrée <strong>$ip " . implode(' ', $hostList) . "</strong> ajoutée.";
                 $msgType = 'success';
             } else {
-                $message = "✗ Impossible d'écrire " . HOSTS_FILE . " — vérifiez les permissions (sudo tee).";
+                $message = "✗ Impossible d'écrire " . HOSTS_FILE . " — vérifiez que le daemon vhost-helper tourne.";
                 $msgType = 'error';
             }
             break;
@@ -411,21 +422,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'hosts_raw_save':
             $content = $_POST['raw_hosts'] ?? '';
-            // Sécurité basique : vérifier que localhost est toujours présent
             if (strpos($content, 'localhost') === false) {
-                $message = "✗ Refus : 'localhost' absent du fichier. Entrées système obligatoires.";
+                $message = "✗ Refus : 'localhost' absent — entrées système obligatoires.";
                 $msgType = 'error';
                 break;
             }
-            $tmp = tempnam(sys_get_temp_dir(), 'hosts_');
-            file_put_contents($tmp, $content);
-            $res = runCommand("sudo tee " . HOSTS_FILE . " < " . escapeshellarg($tmp) . " > /dev/null");
-            unlink($tmp);
+            $res = runVhostCmd('write_hosts', [], $content);
             if ($res['code'] === 0) {
                 $message = "✓ " . HOSTS_FILE . " sauvegardé.";
                 $msgType = 'success';
             } else {
-                $message = "✗ Impossible d'écrire " . HOSTS_FILE . " — vérifiez les permissions (sudo tee).";
+                $message = "✗ " . htmlspecialchars($res['output']);
                 $msgType = 'error';
             }
             break;
