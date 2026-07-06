@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+"""
+vhost-helper — Daemon racine pour VHost Manager v3
+Socket Unix : /run/vhost-manager.sock (root:www-data 0660)
+Protocole   : JSON sur une ligne, réponse JSON
+"""
+import grp, json, os, re, signal, socket, subprocess, sys
+
+SOCK  = '/run/vhost-manager.sock'
+HOSTS = '/etc/hosts'
+SITES_AVAILABLE = '/etc/apache2/sites-available'
+
+# Commandes autorisées et leurs chemins complets
+CMDS = {
+    'a2ensite':       ['/usr/sbin/a2ensite'],
+    'a2dissite':      ['/usr/sbin/a2dissite'],
+    'apache_reload':  ['/usr/sbin/apachectl', 'graceful'],
+    'apache_restart': ['/usr/sbin/apachectl', 'restart'],
+}
+
+def valid_site(name: str) -> bool:
+    return bool(re.fullmatch(r'[a-zA-Z0-9._\-]+\.conf', name or ''))
+
+def handle(raw: bytes) -> dict:
+    try:
+        req     = json.loads(raw.decode('utf-8', errors='replace'))
+        cmd     = req.get('cmd', '')
+        args    = req.get('args', [])
+        content = req.get('content', '')
+
+        # ── Écriture /etc/hosts ─────────────────────────────────────
+        if cmd == 'write_hosts':
+            if 'localhost' not in content:
+                return {'code': 1, 'output': 'Refus : "localhost" absent — entrées système obligatoires'}
+            with open(HOSTS, 'w') as f:
+                f.write(content)
+            return {'code': 0, 'output': 'OK'}
+
+        # ── Écriture d'un fichier .conf (create / edit) ────────────
+        if cmd == 'write_conf':
+            site = str(args[0]) if args else ''
+            if not valid_site(site):
+                return {'code': 1, 'output': f'Nom de site invalide : {site}'}
+            path = os.path.join(SITES_AVAILABLE, site)
+            with open(path, 'w') as f:
+                f.write(content)
+            os.chmod(path, 0o644)
+            return {'code': 0, 'output': 'OK'}
+
+        # ── Suppression d'un fichier .conf ──────────────────────────
+        if cmd == 'delete_conf':
+            site = str(args[0]) if args else ''
+            if not valid_site(site):
+                return {'code': 1, 'output': f'Nom de site invalide : {site}'}
+            path = os.path.join(SITES_AVAILABLE, site)
+            if not os.path.isfile(path):
+                return {'code': 1, 'output': f'Fichier introuvable : {site}'}
+            os.unlink(path)
+            return {'code': 0, 'output': 'OK'}
+
+        # ── Commandes Apache ────────────────────────────────────────
+        if cmd not in CMDS:
+            return {'code': 1, 'output': f'Commande non autorisée : {cmd}'}
+
+        full = list(CMDS[cmd])
+        if args:
+            site = str(args[0])
+            if not valid_site(site):
+                return {'code': 1, 'output': f'Nom de site invalide : {site}'}
+            full.append(site)
+
+        r = subprocess.run(
+            full, capture_output=True, text=True, timeout=30,
+            env={'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LANG': 'en_US.UTF-8'}
+        )
+        return {'code': r.returncode, 'output': (r.stdout + r.stderr).strip()}
+
+    except json.JSONDecodeError:
+        return {'code': 1, 'output': 'JSON invalide'}
+    except Exception as e:
+        return {'code': 1, 'output': str(e)}
+
+def main():
+    if os.getuid() != 0:
+        print('vhost-helper doit être lancé en root.', file=sys.stderr)
+        sys.exit(1)
+
+    # Nettoyage socket précédent
+    if os.path.exists(SOCK):
+        os.unlink(SOCK)
+
+    srv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    srv.bind(SOCK)
+
+    # Permissions : root:www-data rw-rw----
+    try:
+        gid = grp.getgrnam('www-data').gr_gid
+        os.chown(SOCK, 0, gid)
+    except KeyError:
+        pass
+    os.chmod(SOCK, 0o660)
+
+    srv.listen(10)
+
+    def stop(sig, frame):
+        srv.close()
+        if os.path.exists(SOCK):
+            os.unlink(SOCK)
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGINT,  stop)
+
+    print(f'[vhost-helper] En écoute sur {SOCK}', flush=True)
+
+    while True:
+        try:
+            conn, _ = srv.accept()
+            data = b''
+            conn.settimeout(10)
+            try:
+                while True:
+                    chunk = conn.recv(65536)
+                    if not chunk:
+                        break
+                    data += chunk
+                    if len(data) > 5 * 1024 * 1024:   # 5 MB max
+                        break
+            except socket.timeout:
+                pass
+            resp = handle(data)
+            conn.sendall(json.dumps(resp).encode())
+            conn.close()
+        except Exception as e:
+            print(f'[vhost-helper] Erreur : {e}', file=sys.stderr, flush=True)
+
+if __name__ == '__main__':
+    main()

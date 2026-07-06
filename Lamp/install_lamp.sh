@@ -152,15 +152,17 @@ print_message "Création du daemon Python3 vhost-helper..."
 cat > "${VHOST_HELPER_BIN}" << 'PYEOF'
 #!/usr/bin/env python3
 """
-vhost-helper — Daemon racine pour VHost Manager
+vhost-helper — Daemon racine pour VHost Manager v3
 Socket Unix : /run/vhost-manager.sock (root:www-data 0660)
-Protocole   : JSON, réponse JSON
+Protocole   : JSON sur une ligne, réponse JSON
 """
 import grp, json, os, re, signal, socket, subprocess, sys
 
 SOCK  = '/run/vhost-manager.sock'
 HOSTS = '/etc/hosts'
+SITES_AVAILABLE = '/etc/apache2/sites-available'
 
+# Commandes autorisées et leurs chemins complets
 CMDS = {
     'a2ensite':       ['/usr/sbin/a2ensite'],
     'a2dissite':      ['/usr/sbin/a2dissite'],
@@ -178,6 +180,7 @@ def handle(raw: bytes) -> dict:
         args    = req.get('args', [])
         content = req.get('content', '')
 
+        # ── Écriture /etc/hosts ─────────────────────────────────────
         if cmd == 'write_hosts':
             if 'localhost' not in content:
                 return {'code': 1, 'output': 'Refus : "localhost" absent — entrées système obligatoires'}
@@ -185,6 +188,29 @@ def handle(raw: bytes) -> dict:
                 f.write(content)
             return {'code': 0, 'output': 'OK'}
 
+        # ── Écriture d'un fichier .conf (create / edit) ────────────
+        if cmd == 'write_conf':
+            site = str(args[0]) if args else ''
+            if not valid_site(site):
+                return {'code': 1, 'output': f'Nom de site invalide : {site}'}
+            path = os.path.join(SITES_AVAILABLE, site)
+            with open(path, 'w') as f:
+                f.write(content)
+            os.chmod(path, 0o644)
+            return {'code': 0, 'output': 'OK'}
+
+        # ── Suppression d'un fichier .conf ──────────────────────────
+        if cmd == 'delete_conf':
+            site = str(args[0]) if args else ''
+            if not valid_site(site):
+                return {'code': 1, 'output': f'Nom de site invalide : {site}'}
+            path = os.path.join(SITES_AVAILABLE, site)
+            if not os.path.isfile(path):
+                return {'code': 1, 'output': f'Fichier introuvable : {site}'}
+            os.unlink(path)
+            return {'code': 0, 'output': 'OK'}
+
+        # ── Commandes Apache ────────────────────────────────────────
         if cmd not in CMDS:
             return {'code': 1, 'output': f'Commande non autorisée : {cmd}'}
 
@@ -211,12 +237,14 @@ def main():
         print('vhost-helper doit être lancé en root.', file=sys.stderr)
         sys.exit(1)
 
+    # Nettoyage socket précédent
     if os.path.exists(SOCK):
         os.unlink(SOCK)
 
     srv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     srv.bind(SOCK)
 
+    # Permissions : root:www-data rw-rw----
     try:
         gid = grp.getgrnam('www-data').gr_gid
         os.chown(SOCK, 0, gid)
@@ -248,7 +276,7 @@ def main():
                     if not chunk:
                         break
                     data += chunk
-                    if len(data) > 5 * 1024 * 1024:
+                    if len(data) > 5 * 1024 * 1024:   # 5 MB max
                         break
             except socket.timeout:
                 pass
